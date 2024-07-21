@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Div Clicker</title>
+    <style>
+        .clickable-div {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            display: inline-block;
+            background-color: lightblue;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+        }
+        .clicked {
+            background-color: lightgreen;
+        }
+        #divContainer {
+            display: none;
+        }
+        @media (min-width: 768px) {
+            #divContainer {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Div Clicker</h1>
+    <button onclick="createDivs()">Create Divs</button>
+    <div id="divContainer"></div>
+    <br>
+    <button onclick="submitDivs()">Submit</button>
+
+    <h2>Clicked Divs</h2>
+    <ul id="clickedList"></ul>
+
+    <script>
+        const clickedDivs = new Set(JSON.parse(localStorage.getItem('clickedDivs')) || []);
+
+        function createDivs() {
+            const divContainer = document.getElementById('divContainer');
+            divContainer.innerHTML = ''; // Clear existing divs
+            divContainer.style.display = 'block'; // Show div container on button click
+            for (let i = 1; i <= 5; i++) {
+                const div = document.createElement('div');
+                div.className = 'clickable-div';
+                div.id = `div${i}`;
+                div.textContent = `Div ${i}`;
+                if (clickedDivs.has(div.id)) {
+                    div.classList.add('clicked');
+                }
+                div.addEventListener('click', () => toggleDiv(div));
+                divContainer.appendChild(div);
+            }
+        }
+
+        function toggleDiv(div) {
+            const id = div.id;
+            if (clickedDivs.has(id)) {
+                clickedDivs.delete(id);
+                div.classList.remove('clicked');
+            } else {
+                clickedDivs.add(id);
+                div.classList.add('clicked');
+            }
+        }
+
+        function submitDivs() {
+            localStorage.setItem('clickedDivs', JSON.stringify(Array.from(clickedDivs)));
+            displayClickedDivs();
+        }
+
+        function displayClickedDivs() {
+            const clickedDivsArray = Array.from(clickedDivs);
+            const listElement = document.getElementById('clickedList');
+            listElement.innerHTML = ''; // Clear existing list
+            clickedDivsArray.forEach(div => {
+                const listItem = document.createElement('li');
+                listItem.textContent = div;
+                listElement.appendChild(listItem);
+            });
+        }
+
+        // Initial load
+        displayClickedDivs();
+    </script>
+</body>
+</html>
